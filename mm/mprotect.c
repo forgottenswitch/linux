@@ -26,6 +26,7 @@
 #include <linux/pkeys.h>
 #include <linux/ksm.h>
 #include <linux/sched/sysctl.h>
+#include <linux/grinternal.h>
 
 #ifdef CONFIG_PAX_MPROTECT
 #include <linux/elf.h>
@@ -579,6 +580,16 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 		if (current->mm->pax_mprot_x_lockdown) {
 			if (prot & PROT_EXEC) {
 				printk(KERN_ALERT "grsec: denying [R][W]X mprotect after PR_LOCKDOWN_MPROT_X. PID %d, %.900s.\n",
+						(int)task_pid_nr(current), gr_task_fullpath(current));
+
+				error = -EPERM;
+				goto out;
+			}
+		}
+
+		if (current->mm->pax_mprot_wx_lockdown) {
+			if ((prot & PROT_WRITE) && (prot & PROT_EXEC)) {
+				printk(KERN_ALERT "grsec: denying WX mprotect after PR_LOCKDOWN_MPROT_WX; please use switching pages' permissions between [R]W<->[R]X instead. PID %d, %.900s.\n",
 						(int)task_pid_nr(current), gr_task_fullpath(current));
 
 				error = -EPERM;

@@ -1214,6 +1214,7 @@ static int load_elf_binary(struct linux_binprm *bprm)
 	current->mm->pax_flags = 0UL;
 #endif
 	current->mm->pax_mprot_x_lockdown = 0;
+	current->mm->pax_mprot_wx_lockdown = 0;
 
 #ifdef CONFIG_PAX_DLRESOLVE
 	current->mm->call_dl_resolve = 0UL;

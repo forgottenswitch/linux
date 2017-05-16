@@ -2338,6 +2338,10 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 			current->mm->pax_mprot_x_lockdown = 1;
 			/* TODO: scan for WX pages */
 			break;
+		case PR_LOCKDOWN_MPROT_WX:
+			current->mm->pax_mprot_wx_lockdown = 1;
+			/* TODO: scan for WX pages */
+			break;
 		default:
 			error = -EINVAL;
 		}
