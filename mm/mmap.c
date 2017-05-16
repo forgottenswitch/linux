@@ -1450,6 +1450,16 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 			mm->def_flags | VM_MAYREAD | VM_MAYWRITE | VM_MAYEXEC;
 
 #ifdef CONFIG_PAX_MPROTECT
+
+	if (mm->pax_mprot_x_lockdown) {
+		if (prot & PROT_EXEC) {
+			printk(KERN_ALERT "grsec: denying [R][W]X mmap after PR_LOCKDOWN_MPROT_X. PID %d, %.900s.\n",
+					(int)task_pid_nr(current), gr_task_fullpath(current));
+
+			return -EPERM;
+		}
+	}
+
 	if (mm->pax_flags & MF_PAX_MPROTECT) {
 
 #ifdef CONFIG_GRKERNSEC_RWXMAP_LOG
