@@ -1470,14 +1470,10 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 
 		}
 
-		if (!(vm_flags & VM_EXEC))
-			vm_flags &= ~VM_MAYEXEC;
 #else
 		if ((vm_flags & (VM_WRITE | VM_EXEC)) != VM_EXEC)
-			vm_flags &= ~(VM_EXEC | VM_MAYEXEC);
+			vm_flags &= ~VM_EXEC;
 #endif
-		else
-			vm_flags &= ~VM_MAYWRITE;
 	}
 #endif
 
@@ -3283,8 +3279,6 @@ static int do_brk(unsigned long addr, unsigned long request)
 		flags &= ~VM_EXEC;
 
 #ifdef CONFIG_PAX_MPROTECT
-		if (mm->pax_flags & MF_PAX_MPROTECT)
-			flags &= ~VM_MAYEXEC;
 #endif
 
 	}
@@ -3743,14 +3737,10 @@ static struct vm_area_struct *__install_special_mapping(
 #ifndef CONFIG_PAX_MPROTECT_COMPAT
 		if ((vm_flags & (VM_WRITE | VM_EXEC)) == (VM_WRITE | VM_EXEC))
 			return ERR_PTR(-EPERM);
-		if (!(vm_flags & VM_EXEC))
-			vm_flags &= ~VM_MAYEXEC;
 #else
 		if ((vm_flags & (VM_WRITE | VM_EXEC)) != VM_EXEC)
-			vm_flags &= ~(VM_EXEC | VM_MAYEXEC);
+			vm_flags &= ~(VM_EXEC);
 #endif
-		else
-			vm_flags &= ~VM_MAYWRITE;
 	}
 #endif
 
