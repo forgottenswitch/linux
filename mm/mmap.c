@@ -45,6 +45,7 @@
 #include <linux/moduleparam.h>
 #include <linux/pkeys.h>
 #include <linux/random.h>
+#include <linux/grinternal.h>
 
 #include <asm/uaccess.h>
 #include <asm/cacheflush.h>
@@ -1454,6 +1455,15 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 	if (mm->pax_mprot_x_lockdown) {
 		if (prot & PROT_EXEC) {
 			printk(KERN_ALERT "grsec: denying [R][W]X mmap after PR_LOCKDOWN_MPROT_X. PID %d, %.900s.\n",
+					(int)task_pid_nr(current), gr_task_fullpath(current));
+
+			return -EPERM;
+		}
+	}
+
+	if (mm->pax_mprot_wx_lockdown) {
+		if ((prot & PROT_WRITE) && (prot & PROT_EXEC)) {
+			printk(KERN_ALERT "grsec: denying WX mmap after PR_LOCKDOWN_MPROT_WX; please use switching pages' permissions between [R]W<->[R]X instead. PID %d, %.900s.\n",
 					(int)task_pid_nr(current), gr_task_fullpath(current));
 
 			return -EPERM;

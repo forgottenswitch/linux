@@ -268,6 +268,7 @@ static int load_aout_binary(struct linux_binprm * bprm)
 	current->mm->pax_flags = 0UL;
 #endif
 	current->mm->pax_mprot_x_lockdown = 0;
+	current->mm->pax_mprot_wx_lockdown = 0;
 
 #ifdef CONFIG_PAX_PAGEEXEC
 	if (!(N_FLAGS(ex) & F_PAX_PAGEEXEC)) {
