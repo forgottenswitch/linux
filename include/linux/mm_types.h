@@ -523,6 +523,7 @@ struct mm_struct {
 #if defined(CONFIG_PAX_NOEXEC) || defined(CONFIG_PAX_ASLR)
 	unsigned long pax_flags;
 #endif
+	unsigned pax_mprot_x_lockdown : 1;
 
 #ifdef CONFIG_PAX_DLRESOLVE
 	unsigned long call_dl_resolve;

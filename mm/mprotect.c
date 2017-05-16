@@ -574,6 +574,20 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 		newflags = calc_vm_prot_bits(prot, new_vma_pkey);
 		newflags |= (vma->vm_flags & ~mask_off_old_flags);
 
+#ifdef CONFIG_PAX_MPROTECT
+
+		if (current->mm->pax_mprot_x_lockdown) {
+			if (prot & PROT_EXEC) {
+				printk(KERN_ALERT "grsec: denying [R][W]X mprotect after PR_LOCKDOWN_MPROT_X. PID %d, %.900s.\n",
+						(int)task_pid_nr(current), gr_task_fullpath(current));
+
+				error = -EPERM;
+				goto out;
+			}
+		}
+
+#endif
+
 		/* newflags >> 4 shift VM_MAY% in place of VM_% */
 		if ((newflags & ~(newflags >> 4)) & (VM_READ | VM_WRITE | VM_EXEC)) {
 			if (prot & (PROT_WRITE | PROT_EXEC))

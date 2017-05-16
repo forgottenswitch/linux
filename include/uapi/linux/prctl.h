@@ -197,4 +197,12 @@ struct prctl_mm_map {
 # define PR_CAP_AMBIENT_LOWER		3
 # define PR_CAP_AMBIENT_CLEAR_ALL	4
 
+/*
+ * Disallow executable mmap/mprotect from now on.  Intended for use by ld.so to
+ * prevent introduction of [malicious] new code into privileged processes.  This
+ * should also scan for WX pages and make them X-only (or maybe add a flag for W-only?).
+ */
+#define PR_LOCKDOWN_MPROT		48
+# define PR_LOCKDOWN_MPROT_X		1
+
 #endif /* _LINUX_PRCTL_H */

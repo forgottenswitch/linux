@@ -2332,6 +2332,16 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 	case PR_GET_FP_MODE:
 		error = GET_FP_MODE(me);
 		break;
+	case PR_LOCKDOWN_MPROT:
+		switch (arg2) {
+		case PR_LOCKDOWN_MPROT_X:
+			current->mm->pax_mprot_x_lockdown = 1;
+			/* TODO: scan for WX pages */
+			break;
+		default:
+			error = -EINVAL;
+		}
+		break;
 	default:
 		error = -EINVAL;
 		break;
