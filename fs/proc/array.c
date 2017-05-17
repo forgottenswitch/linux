@@ -371,7 +371,7 @@ static inline void task_pax(struct seq_file *m, struct task_struct *p)
 	if (p->mm)
 		seq_printf(m, "PaX:\t%c%c%c%c%c\n",
 			   p->mm->pax_flags & MF_PAX_PAGEEXEC ? 'P' : 'p',
-			   p->mm->pax_flags & MF_PAX_EMUTRAMP ? 'E' : 'e',
+			   p->mm->pax_flags & MF_PAX_EMUTRAMP ? 'e' : 'e',
 			   p->mm->pax_flags & MF_PAX_MPROTECT ? 'M' : 'm',
 			   p->mm->pax_flags & MF_PAX_RANDMMAP ? 'R' : 'r',
 			   p->mm->pax_flags & MF_PAX_SEGMEXEC ? 'S' : 's');
