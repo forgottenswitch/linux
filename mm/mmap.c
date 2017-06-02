@@ -1478,22 +1478,24 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 			mm->binfmt->handle_mmap(file);
 #endif
 
+		if (mm->pax_mprot_x_lockdown || mm->pax_mprot_wx_lockdown) {
 #ifndef CONFIG_PAX_MPROTECT_COMPAT
-		if ((vm_flags & (VM_WRITE | VM_EXEC)) == (VM_WRITE | VM_EXEC)) {
-			gr_log_rwxmmap(file);
+			if ((vm_flags & (VM_WRITE | VM_EXEC)) == (VM_WRITE | VM_EXEC)) {
+				gr_log_rwxmmap(file);
 
 #ifdef CONFIG_PAX_EMUPLT
-			vm_flags &= ~VM_EXEC;
+				vm_flags &= ~VM_EXEC;
 #else
-			return -EPERM;
-#endif
+				return -EPERM;
+#endif /* CONFIG_PAX_EMUPLT */
 
+			}
+
+#else
+			if ((vm_flags & (VM_WRITE | VM_EXEC)) != VM_EXEC)
+				vm_flags &= ~VM_EXEC;
+#endif /* CONFIG_PAX_MPROTECT_COMPAT */
 		}
-
-#else
-		if ((vm_flags & (VM_WRITE | VM_EXEC)) != VM_EXEC)
-			vm_flags &= ~VM_EXEC;
-#endif
 	}
 #endif
 
@@ -3754,13 +3756,15 @@ static struct vm_area_struct *__install_special_mapping(
 
 #ifdef CONFIG_PAX_MPROTECT
 	if (mm->pax_flags & MF_PAX_MPROTECT) {
+		if (mm->pax_mprot_x_lockdown || mm->pax_mprot_wx_lockdown) {
 #ifndef CONFIG_PAX_MPROTECT_COMPAT
-		if ((vm_flags & (VM_WRITE | VM_EXEC)) == (VM_WRITE | VM_EXEC))
-			return ERR_PTR(-EPERM);
+			if ((vm_flags & (VM_WRITE | VM_EXEC)) == (VM_WRITE | VM_EXEC))
+				return ERR_PTR(-EPERM);
 #else
-		if ((vm_flags & (VM_WRITE | VM_EXEC)) != VM_EXEC)
-			vm_flags &= ~(VM_EXEC);
-#endif
+			if ((vm_flags & (VM_WRITE | VM_EXEC)) != VM_EXEC)
+				vm_flags &= ~VM_EXEC;
+#endif /* CONFIG_PAX_MPROTECT_COMPAT */
+		}
 	}
 #endif
 
