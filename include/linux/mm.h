@@ -1380,6 +1380,8 @@ extern unsigned long change_protection(struct vm_area_struct *vma, unsigned long
 extern int mprotect_fixup(struct vm_area_struct *vma,
 			  struct vm_area_struct **pprev, unsigned long start,
 			  unsigned long end, unsigned long newflags);
+extern void unmprotect_all_pages(unsigned long flags_to_match,
+			unsigned long flags_to_strip);
 
 /*
  * doesn't attempt to fault and will return short.

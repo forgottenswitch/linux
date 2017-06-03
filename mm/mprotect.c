@@ -645,6 +645,32 @@ out:
 	return error;
 }
 
+/*
+ * Strips flags_to_strip bits off any pages in the current task
+ * that have all of flags_to_match bits.
+ */
+void unmprotect_all_pages(unsigned long flags_to_match, unsigned long flags_to_strip) {
+	struct vm_area_struct *vma;
+	unsigned long i, oldflags, newflags;
+	int dirty_accountable;
+
+	vma = current->mm->mmap;
+	for (i = 0; i < current->mm->map_count && vma; i++) {
+		oldflags = vma->vm_flags;
+		if ((oldflags & flags_to_match) == flags_to_match) {
+			newflags = oldflags & ~flags_to_strip;
+			if (newflags != oldflags) {
+				dirty_accountable = vma_wants_writenotify(vma, vma->vm_page_prot);
+				vma->vm_flags = newflags;
+				vma_set_page_prot(vma);
+				change_protection(vma, vma->vm_start, vma->vm_end, vma->vm_page_prot,
+						dirty_accountable, 0);
+			}
+		}
+		vma = vma->vm_next;
+	}
+}
+
 SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
 		unsigned long, prot)
 {

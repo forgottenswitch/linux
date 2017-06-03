@@ -2336,11 +2336,15 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		switch (arg2) {
 		case PR_LOCKDOWN_MPROT_X:
 			current->mm->pax_mprot_x_lockdown = 1;
-			/* TODO: scan for WX pages */
 			break;
 		case PR_LOCKDOWN_MPROT_WX:
 			current->mm->pax_mprot_wx_lockdown = 1;
-			/* TODO: scan for WX pages */
+			break;
+		case PR_LOCKDOWN_MPROT_STRIP_WX_X:
+			unmprotect_all_pages(VM_WRITE|VM_EXEC, VM_EXEC);
+			break;
+		case PR_LOCKDOWN_MPROT_STRIP_WX_W:
+			unmprotect_all_pages(VM_WRITE|VM_EXEC, VM_WRITE);
 			break;
 		default:
 			error = -EINVAL;
