@@ -527,6 +527,7 @@ struct mm_struct {
 	unsigned pax_mprot_wx_lockdown : 1;
 	unsigned pax_mprot_nx_fatal : 1;	/* send SIGKILL instead of SIGSEGV on
 						   an instruction fetch fault */
+	unsigned pax_ptracible_by_non_ancestors : 1;
 
 #ifdef CONFIG_PAX_DLRESOLVE
 	unsigned long call_dl_resolve;

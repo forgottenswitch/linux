@@ -959,6 +959,21 @@ static unsigned long pax_parse_xattr_pax(struct file * const file)
 
 }
 
+static int pax_file_has_xattr(struct file * const file, const char *name) {
+	char buf[64];
+	ssize_t len;
+
+	len = pax_get_named_xattr(file->f_path.dentry, name, buf, sizeof buf);
+	if (len >= 0)
+		return 1;
+	return 0;
+}
+
+static void pax_parse_named_flags(struct file * const file) {
+	if (pax_file_has_xattr(file, XATTR_NAME_USER_PAX_PTRACIBLE))
+		current->mm->pax_ptracible_by_non_ancestors = 1;
+}
+
 static long pax_parse_pax_flags(const struct elfhdr * const elf_ex, const struct elf_phdr * const elf_phdata, struct file * const file)
 {
 	unsigned long pax_flags, ei_pax_flags,  pt_pax_flags, xattr_pax_flags;
@@ -1216,6 +1231,7 @@ static int load_elf_binary(struct linux_binprm *bprm)
 	current->mm->pax_mprot_x_lockdown = 0;
 	current->mm->pax_mprot_wx_lockdown = 0;
 	current->mm->pax_mprot_nx_fatal = 0;
+	current->mm->pax_ptracible_by_non_ancestors = 0;
 
 #ifdef CONFIG_PAX_DLRESOLVE
 	current->mm->call_dl_resolve = 0UL;
@@ -1236,6 +1252,8 @@ static int load_elf_binary(struct linux_binprm *bprm)
 		goto out_free_dentry;
 	}
 #endif
+
+	pax_parse_named_flags(bprm->file);
 
 #ifdef CONFIG_PAX_HAVE_ACL_FLAGS
 	pax_set_initial_flags(bprm);

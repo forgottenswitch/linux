@@ -2344,10 +2344,12 @@ gr_handle_proc_ptrace(struct task_struct *task)
 	read_lock(&grsec_exec_file_lock);
 	filp = task->exec_file;
 
-	while (task_pid_nr(tmp) > 0) {
-		if (tmp == curtemp)
-			break;
-		tmp = tmp->real_parent;
+	if (!(task->mm->pax_ptracible_by_non_ancestors)) {
+		while (task_pid_nr(tmp) > 0) {
+			if (tmp == curtemp)
+				break;
+			tmp = tmp->real_parent;
+		}
 	}
 
 	if (!filp || (task_pid_nr(tmp) == 0 && ((grsec_enable_harden_ptrace && gr_is_global_nonroot(current_uid()) && !(gr_status & GR_READY)) ||
@@ -2406,10 +2408,12 @@ gr_handle_ptrace(struct task_struct *task, const long request)
 #endif
 	if (request == PTRACE_ATTACH || request == PTRACE_SEIZE) {
 		read_lock(&tasklist_lock);
-		while (task_pid_nr(tmp) > 0) {
-			if (tmp == curtemp)
-				break;
-			tmp = tmp->real_parent;
+		if (!(task->mm->pax_ptracible_by_non_ancestors)) {
+			while (task_pid_nr(tmp) > 0) {
+				if (tmp == curtemp)
+					break;
+				tmp = tmp->real_parent;
+			}
 		}
 
 		if (task_pid_nr(tmp) == 0 && ((grsec_enable_harden_ptrace && gr_is_global_nonroot(current_uid()) && !(gr_status & GR_READY)) ||
