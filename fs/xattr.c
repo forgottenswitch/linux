@@ -326,6 +326,20 @@ pax_getxattr(struct dentry *dentry, void *value, size_t size)
 	return __vfs_getxattr(dentry, inode, XATTR_NAME_USER_PAX_FLAGS, value, size);
 }
 EXPORT_SYMBOL(pax_getxattr);
+
+ssize_t
+pax_get_named_xattr(struct dentry *dentry, const char *name, void *value, size_t size)
+{
+	struct inode *inode = dentry->d_inode;
+	ssize_t error;
+
+	error = inode_permission(inode, MAY_EXEC);
+	if (error)
+		return error;
+
+	return __vfs_getxattr(dentry, inode, name, value, size);
+}
+EXPORT_SYMBOL(pax_get_named_xattr);
 #endif
 
 ssize_t
