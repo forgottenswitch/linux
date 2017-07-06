@@ -79,7 +79,9 @@ static void pax_switch_mm(struct mm_struct *next, unsigned int cpu)
 
 		__clone_user_pgds(get_cpu_pgd(cpu, kernel), next->pgd);
 
+#if defined(CONFIG_X86_64) && defined(CONFIG_PAX_MEMORY_UDEREF)
 	__shadow_user_pgds(get_cpu_pgd(cpu, kernel) + USER_PGD_PTRS, next->pgd);
+#endif
 
 	pax_close_kernel();
 

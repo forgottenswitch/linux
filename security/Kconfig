@@ -15,8 +15,8 @@ config PAX_PER_CPU_PGD
 config TASK_SIZE_MAX_SHIFT
 	int
 	depends on X86_64
-	default 47 if !PAX_PER_CPU_PGD
-	default 42 if PAX_PER_CPU_PGD
+	default 47 if !PAX_MEMORY_UDEREF
+	default 46 if PAX_MEMORY_UDEREF
 
 config PAX_ENABLE_PAE
 	bool
