@@ -983,17 +983,19 @@ __bad_area_nosemaphore(struct pt_regs *regs, unsigned long error_code,
 #endif
 
 #if defined(CONFIG_PAX_PAGEEXEC) || defined(CONFIG_PAX_SEGMEXEC)
-		if (pax_is_fetch_fault(regs, error_code, address)) {
+		if (current->mm->pax_mprot_nx_fatal) {
+			if (pax_is_fetch_fault(regs, error_code, address)) {
 
 #ifdef CONFIG_PAX_EMUTRAMP
-			switch (pax_handle_fetch_fault(regs)) {
-			case 2:
-				return;
-			}
+				switch (pax_handle_fetch_fault(regs)) {
+				case 2:
+					return;
+				}
 #endif
 
-			pax_report_fault(regs, (void *)regs->ip, (void *)regs->sp);
-			do_group_exit(SIGKILL);
+				pax_report_fault(regs, (void *)regs->ip, (void *)regs->sp);
+				do_group_exit(SIGKILL);
+			}
 		}
 #endif
 

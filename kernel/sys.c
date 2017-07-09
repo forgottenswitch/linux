@@ -2340,6 +2340,9 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		case PR_LOCKDOWN_MPROT_WX:
 			current->mm->pax_mprot_wx_lockdown = 1;
 			break;
+		case PR_LOCKDOWN_MPROT_NX_FATAL:
+			current->mm->pax_mprot_nx_fatal = 1;
+			break;
 		case PR_LOCKDOWN_MPROT_STRIP_WX_X:
 			unmprotect_all_pages(VM_WRITE|VM_EXEC, VM_EXEC);
 			break;
