@@ -525,6 +525,8 @@ struct mm_struct {
 #endif
 	unsigned pax_mprot_x_lockdown : 1;
 	unsigned pax_mprot_wx_lockdown : 1;
+	unsigned pax_mprot_nx_fatal : 1;	/* send SIGKILL instead of SIGSEGV on
+						   an instruction fetch fault */
 
 #ifdef CONFIG_PAX_DLRESOLVE
 	unsigned long call_dl_resolve;

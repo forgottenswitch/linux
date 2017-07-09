@@ -199,6 +199,7 @@ struct prctl_mm_map {
 
 /*
  * Disallow executable, or writable+executable, mmap/mprotect from now on.
+ * Or make instruction fetch fault send SIGKILL instead of SIGSEGV.
  * Intended for use by ld.so to prevent introduction of [malicious] new code
  * into privileged processes.  This should also scan for WX pages and make them
  * X-only (or maybe add a flag for W-only?).
@@ -208,5 +209,6 @@ struct prctl_mm_map {
 # define PR_LOCKDOWN_MPROT_WX		2
 # define PR_LOCKDOWN_MPROT_STRIP_WX_X	3
 # define PR_LOCKDOWN_MPROT_STRIP_WX_W	4
+# define PR_LOCKDOWN_MPROT_NX_FATAL	5
 
 #endif /* _LINUX_PRCTL_H */

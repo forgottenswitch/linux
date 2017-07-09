@@ -2340,6 +2340,9 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		case PR_LOCKDOWN_MPROT_WX:
 			current->mm->pax_mprot_wx_lockdown = 1;
 			break;
+		case PR_LOCKDOWN_MPROT_NX_FATAL:
+			current->mm->pax_mprot_nx_fatal = 1;
+			break;
 		case PR_LOCKDOWN_MPROT_STRIP_WX_X:
 			if (!down_write_trylock(&current->mm->mmap_sem))
 				error = -EAGAIN;
