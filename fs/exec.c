@@ -765,8 +765,6 @@ int setup_arg_pages(struct linux_binprm *bprm,
 		vm_flags &= ~VM_EXEC;
 
 #ifdef CONFIG_PAX_MPROTECT
-		if (mm->pax_flags & MF_PAX_MPROTECT)
-			vm_flags &= ~VM_MAYEXEC;
 #endif
 
 	}
