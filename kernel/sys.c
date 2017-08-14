@@ -2344,10 +2344,20 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 			current->mm->pax_mprot_nx_fatal = 1;
 			break;
 		case PR_LOCKDOWN_MPROT_STRIP_WX_X:
-			unmprotect_all_pages(VM_WRITE|VM_EXEC, VM_EXEC);
+			if (!down_write_trylock(&current->mm->mmap_sem))
+				error = -EAGAIN;
+			else {
+				unmprotect_all_pages(VM_WRITE|VM_EXEC, VM_EXEC);
+				up_write(&current->mm->mmap_sem);
+			}
 			break;
 		case PR_LOCKDOWN_MPROT_STRIP_WX_W:
-			unmprotect_all_pages(VM_WRITE|VM_EXEC, VM_WRITE);
+			if (!down_write_trylock(&current->mm->mmap_sem))
+				error = -EAGAIN;
+			else {
+				unmprotect_all_pages(VM_WRITE|VM_EXEC, VM_WRITE);
+				up_write(&current->mm->mmap_sem);
+			}
 			break;
 		default:
 			error = -EINVAL;
